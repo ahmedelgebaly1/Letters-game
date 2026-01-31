@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Alphabet Master - Audio Enabled</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --success: #2ec4b6;
+            --error: #e63946;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2b2d42;
+            --gold: #f7b731;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 650px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Header Styling --- */
+        .group-header-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .group-title-en {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            text-align: left;
+        }
+        .group-title-ar {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            direction: rtl;
+        }
+
+        /* --- Question Display --- */
+        .arabic-display {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 5rem;
+            color: var(--primary);
+            margin: 10px 0;
+            direction: rtl;
+            line-height: 1.3;
+        }
+
+        .word-text { font-size: 3.5rem; }
+
+        h2 { font-size: 1.2rem; color: #666; font-weight: 400; margin-bottom: 1rem; }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* --- Stats Bar --- */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            font-weight: bold;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .score-display { color: var(--success); }
+
+        /* --- Options Grid --- */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-family: 'Nunito', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background-color: #f0f4ff;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .option-btn.wrong {
+            background-color: var(--error);
+            color: white;
+            border-color: var(--error);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        /* --- Feedback --- */
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 3.5em;
+        }
+        .points-earned {
+            font-size: 0.9rem;
+            color: #888;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* --- Buttons --- */
+        .btn-main {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        .btn-main:hover { background-color: var(--secondary); transform: translateY(-2px); }
+
+        /* --- Screens --- */
+        .screen { display: none; animation: fadeIn 0.5s; }
+        .screen.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Summary Card --- */
+        .summary-card {
+            background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .summary-score {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        .star-icon { color: var(--gold); font-size: 2rem; margin-bottom: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="start-screen" class="screen active">
+            <h1 style="color:var(--primary)">Arabic Alphabet Master</h1>
+            <p>Master the 28 letters, their positions, and words.</p>
+            <div class="arabic-display" style="font-size:3rem">أ ب ت</div>
+            <p>Listen carefully and choose the correct answer!</p>
+            <button class="btn-main" style="display:inline-block" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="stats-bar">
+                <span id="group-progress-text">Group 1</span>
+                <span class="score-display">Score: <span id="current-score">0</span></span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            
+            <h2 id="question-instruction">Instruction...</h2>
+            
+            <div id="dynamic-content"></div>
+            
+            <div class="options-grid" id="options-container">
+                </div>
+
+            <div id="feedback"></div>
+            <button id="next-btn" class="btn-main" onclick="nextQuestion()">Next</button>
+        </div>
+
+        <div id="summary-screen" class="screen">
+            <h1>Group Complete!</h1>
+            <div class="summary-card">
+                <div class="star-icon">★★★★★</div>
+                <div id="summary-message">Outstanding Performance!</div>
+                <div class="summary-score" id="group-score-display">0</div>
+                <p>Points earned in this group</p>
+                <p style="font-size:0.9rem; color:#666">Time Taken: <span id="group-time">0</span>s</p>
+            </div>
+            <button class="btn-main" style="display:inline-block" onclick="startNextGroup()">Continue</button>
+        </div>
+
+        <div id="end-screen" class="screen">
+            <h1>Course Completed!</h1>
+            <div class="arabic-display">مبروك</div>
+            <p>You have mastered the Arabic Alphabet!</p>
+            <div class="summary-card">
+                <p>Final Total Score</p>
+                <div class="summary-score" id="final-total-score">0</div>
+            </div>
+            <button class="btn-main" style="display:inline-block" onclick="location.reload()">Play Again</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- AUDIO CONFIGURATION ---
+        // Using raw.githubusercontent.com to serve the files directly
+        const correctSound = new Audio('https://raw.githubusercontent.com/ahmedelgebaly1/Letters-game/main/Correct%20answer.mp3');
+        const wrongSound = new Audio('https://raw.githubusercontent.com/ahmedelgebaly1/Letters-game/main/Wrong%20answer.mp3');
+
+        // Preload audio
+        correctSound.preload = 'auto';
+        wrongSound.preload = 'auto';
+
+        function playSound(type) {
+            // Reset sound to start if played repeatedly quickly
+            if (type === 'correct') {
+                correctSound.currentTime = 0;
+                correctSound.play().catch(e => console.log("Audio play blocked or failed", e));
+            } else {
+                wrongSound.currentTime = 0;
+                wrongSound.play().catch(e => console.log("Audio play blocked or failed", e));
+            }
+        }
+
+        // --- DATA ---
+        
+        const lettersDB = {
+            // Group 1: ب - ت - ث - ن - ي
+            'ب': { en: 'Ba', forms: { iso:'ب', beg:'بـ', med:'ـبـ', end:'ـب' } },
+            'ت': { en: 'Ta', forms: { iso:'ت', beg:'تـ', med:'ـتـ', end:'ـت' } },
+            'ث': { en: 'Tha', forms: { iso:'ث', beg:'ثـ', med:'ـثـ', end:'ـث' } },
+            'ن': { en: 'Nun', forms: { iso:'ن', beg:'نـ', med:'ـنـ', end:'ـن' } },
+            'ي': { en: 'Ya', forms: { iso:'ي', beg:'يـ', med:'ـيـ', end:'ـي' } },
+
+            // Group 2: د - ذ - ر - ز - و - أ
+            'د': { en: 'Dal', forms: { iso:'د', beg:'د', med:'ـد', end:'ـد' } },
+            'ذ': { en: 'Dhal', forms: { iso:'ذ', beg:'ذ', med:'ـذ', end:'ـذ' } },
+            'ر': { en: 'Ra', forms: { iso:'ر', beg:'ر', med:'ـر', end:'ـر' } },
+            'ز': { en: 'Zay', forms: { iso:'ز', beg:'ز', med:'ـز', end:'ـز' } },
+            'و': { en: 'Waw', forms: { iso:'و', beg:'و', med:'ـو', end:'ـو' } },
+            'أ': { en: 'Alif', forms: { iso:'أ', beg:'أ', med:'ـأ', end:'ـأ' } },
+
+            // Group 3: ج - ح - خ - هـ - م
+            'ج': { en: 'Jim', forms: { iso:'ج', beg:'جـ', med:'ـجـ', end:'ـج' } },
+            'ح': { en: 'Ha', forms: { iso:'ح', beg:'حـ', med:'ـحـ', end:'ـح' } },
+            'خ': { en: 'Kha', forms: { iso:'خ', beg:'خـ', med:'ـخـ', end:'ـخ' } },
+            'هـ': { en: 'Ha (Hey)', forms: { iso:'هـ', beg:'هـ', med:'ـهـ', end:'ـه' } },
+            'م': { en: 'Mim', forms: { iso:'م', beg:'مـ', med:'ـمـ', end:'ـم' } },
+
+            // Group 4: س - ش - ص - ض
+            'س': { en: 'Sin', forms: { iso:'س', beg:'سـ', med:'ـسـ', end:'ـس' } },
+            'ش': { en: 'Shin', forms: { iso:'ش', beg:'شـ', med:'ـشـ', end:'ـش' } },
+            'ص': { en: 'Sad', forms: { iso:'ص', beg:'صـ', med:'ـصـ', end:'ـص' } },
+            'ض': { en: 'Dad', forms: { iso:'ض', beg:'ضـ', med:'ـضـ', end:'ـض' } },
+
+            // Group 5: ف - ق - ك - ل
+            'ف': { en: 'Fa', forms: { iso:'ف', beg:'فـ', med:'ـفـ', end:'ـف' } },
+            'ق': { en: 'Qaf', forms: { iso:'ق', beg:'قـ', med:'ـقـ', end:'ـق' } },
+            'ك': { en: 'Kaf', forms: { iso:'ك', beg:'كـ', med:'ـكـ', end:'ـك' } },
+            'ل': { en: 'Lam', forms: { iso:'ل', beg:'لـ', med:'ـلـ', end:'ـل' } },
+
+            // Group 6: ط - ظ - ع - غ
+            'ط': { en: 'Ta (Emphatic)', forms: { iso:'ط', beg:'طـ', med:'ـطـ', end:'ـط' } },
+            'ظ': { en: 'Dha (Emphatic)', forms: { iso:'ظ', beg:'ظـ', med:'ـظـ', end:'ـظ' } },
+            'ع': { en: 'Ain', forms: { iso:'ع', beg:'عـ', med:'ـعـ', end:'ـع' } },
+            'غ': { en: 'Ghain', forms: { iso:'غ', beg:'غـ', med:'ـغـ', end:'ـغ' } }
+        };
+
+        const groups = [
+            { id: 1, title: "Group 1", chars: ['ب', 'ت', 'ث', 'ن', 'ي'], words: [{ ar: 'بيت', en: 'Bayt' }, { ar: 'تين', en: 'Teen' }] },
+            { id: 2, title: "Group 2", chars: ['د', 'ذ', 'ر', 'ز', 'و', 'أ'], words: [{ ar: 'أب', en: 'Ab' }, { ar: 'ورد', en: 'Ward' }] },
+            { id: 3, title: "Group 3", chars: ['ج', 'ح', 'خ', 'هـ', 'م'], words: [{ ar: 'حجر', en: 'Hajar' }, { ar: 'مخ', en: 'Mukh' }] },
+            { id: 4, title: "Group 4", chars: ['س', 'ش', 'ص', 'ض'], words: [{ ar: 'شمس', en: 'Shams' }, { ar: 'صبر', en: 'Sabr' }] },
+            { id: 5, title: "Group 5", chars: ['ف', 'ق', 'ك', 'ل'], words: [{ ar: 'قلم', en: 'Qalam' }, { ar: 'كلب', en: 'Kalb' }] },
+            { id: 6, title: "Group 6", chars: ['ط', 'ظ', 'ع', 'غ'], words: [{ ar: 'علم', en: 'Alam' }, { ar: 'غزال', en: 'Ghazal' }] }
+        ];
+
+        const positiveFeedback = ["Bravoooo!", "Excellent!", "Superb!", "Amazing!", "Well Done!"];
+        const negativeFeedback = ["Try Again", "Not Quite", "Oops!", "Close!"];
+        const summaryMessages = ["You are a natural!", "Keep up the great work!", "Arabic Master in the making!", "Fantastic progress!"];
+
+        // --- GAME STATE ---
+        let currentGroupIndex = 0;
+        let questionQueue = [];
+        let currentQuestionIndex = 0;
+        let totalScore = 0;
+        let currentGroupScore = 0;
+        let groupStartTime = 0;
+        let questionStartTime = 0;
+        let isQuestionActive = true;
+
+        // --- LOGIC ---
+
+        function startGame() {
+            showScreen('game-screen');
+            loadGroup(0);
+        }
+
+        function loadGroup(index) {
+            currentGroupIndex = index;
+            if (index >= groups.length) {
+                endGame();
+                return;
+            }
+            
+            currentGroupScore = 0;
+            groupStartTime = Date.now();
+            document.getElementById('group-progress-text').textContent = `Group ${index + 1} of ${groups.length}`;
+            
+            generateQuestionsForGroup(groups[index]);
+            currentQuestionIndex = 0;
+            displayQuestion();
+        }
+
+        function generateQuestionsForGroup(group) {
+            questionQueue = [];
+
+            // 1. Info Card
+            questionQueue.push({
+                type: 'info',
+                groupTitle: group.title,
+                groupChars: group.chars.join(' - ')
+            });
+
+            // 2. Identification
+            group.chars.forEach(char => {
+                const correctEnglish = lettersDB[char].en;
+                questionQueue.push({
+                    type: 'ident',
+                    instruction: "Identify this letter:",
+                    display: char, 
+                    correct: correctEnglish,
+                    options: generateDistractorsEnglishOnly(correctEnglish, group.chars)
+                });
+            });
+
+            // 3. Positions
+            const shuffledChars = [...group.chars].sort(() => 0.5 - Math.random()).slice(0, 3);
+            shuffledChars.forEach(char => {
+                const forms = lettersDB[char].forms;
+                const charEnglishName = lettersDB[char].en;
+                const positions = ['med', Math.random() > 0.5 ? 'beg' : 'end'];
+                
+                positions.forEach(pos => {
+                    let posText = "";
+                    if(pos === 'beg') posText = "Beginning";
+                    if(pos === 'med') posText = "Middle";
+                    if(pos === 'end') posText = "End";
+                    
+                    const correctOptionText = `${charEnglishName} (${posText})`;
+                    
+                    let distractors = [];
+                    const wrongPos = pos === 'beg' ? 'End' : 'Beginning';
+                    distractors.push(`${charEnglishName} (${wrongPos})`);
+                    distractors.push(`${charEnglishName} (Isolated)`);
+                    const otherCharAr = group.chars.find(c => c !== char) || 'ب'; 
+                    const otherCharEn = lettersDB[otherCharAr].en;
+                    distractors.push(`${otherCharEn} (${posText})`);
+                    
+                    questionQueue.push({
+                        type: 'pos',
+                        instruction: `Identify the letter and its position:`,
+                        display: forms[pos],
+                        correct: correctOptionText,
+                        options: shuffleArray([correctOptionText, ...distractors])
+                    });
+                });
+            });
+
+            // 4. Words
+            group.words.forEach(word => {
+                questionQueue.push({
+                    type: 'word',
+                    instruction: "Read this word:",
+                    display: word.ar,
+                    correct: word.en,
+                    options: generateWordDistractors(word.en)
+                });
+            });
+        }
+
+        function displayQuestion() {
+            isQuestionActive = true;
+            questionStartTime = Date.now();
+            
+            const q = questionQueue[currentQuestionIndex];
+            const contentDiv = document.getElementById('dynamic-content');
+            const instructionEl = document.getElementById('question-instruction');
+            const optionsContainer = document.getElementById('options-container');
+            const feedbackEl = document.getElementById('feedback');
+            const nextBtn = document.getElementById('next-btn');
+            
+            feedbackEl.innerHTML = '';
+            nextBtn.style.display = 'none';
+            optionsContainer.innerHTML = '';
+            contentDiv.innerHTML = '';
+
+            const progressPct = ((currentQuestionIndex) / questionQueue.length) * 100;
+            document.getElementById('progress').style.width = `${progressPct}%`;
+
+            if (q.type === 'info') {
+                instructionEl.textContent = "New Group Unlocked";
+                contentDiv.innerHTML = `
+                    <div class="group-header-container">
+                        <div class="group-title-en">Let's learn: ${q.groupTitle}</div>
+                        <div class="group-title-ar">${q.groupChars}</div>
+                    </div>
+                `;
+                const btn = document.createElement('button');
+                btn.className = "btn-main";
+                btn.style.display = "inline-block";
+                btn.textContent = "Start Practice";
+                btn.onclick = nextQuestion;
+                optionsContainer.appendChild(btn);
+                optionsContainer.style.display = 'block';
+                return;
+            }
+
+            optionsContainer.style.display = 'grid';
+            instructionEl.textContent = q.instruction;
+            
+            const displayEl = document.createElement('div');
+            displayEl.className = q.type === 'word' ? "arabic-display word-text" : "arabic-display";
+            displayEl.textContent = q.display;
+            contentDiv.appendChild(displayEl);
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt; 
+                btn.onclick = () => checkAnswer(opt, q.correct, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btnElement) {
+            // If already solved, stop.
+            if (!isQuestionActive) return;
+            
+            const feedbackEl = document.getElementById('feedback');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (selected === correct) {
+                // --- CORRECT ANSWER ---
+                playSound('correct'); // Play Sound
+                
+                isQuestionActive = false;
+                btnElement.classList.add('correct');
+                
+                const allBtns = document.querySelectorAll('.option-btn');
+                allBtns.forEach(btn => btn.disabled = true);
+
+                const timeTaken = (Date.now() - questionStartTime) / 1000;
+                let points = Math.max(10, 100 - Math.floor(timeTaken * 10));
+                
+                currentGroupScore += points;
+                totalScore += points;
+                document.getElementById('current-score').textContent = totalScore;
+
+                const randomMsg = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
+                feedbackEl.innerHTML = `
+                    <div style="color:var(--success)">${randomMsg}</div>
+                    <span class="points-earned">+${points} pts (${timeTaken.toFixed(1)}s)</span>
+                `;
+                nextBtn.style.display = 'inline-block';
+            
+            } else {
+                // --- WRONG ANSWER ---
+                playSound('wrong'); // Play Sound
+                
+                btnElement.classList.add('wrong');
+                btnElement.disabled = true; 
+
+                const randomMsg = negativeFeedback[Math.floor(Math.random() * negativeFeedback.length)];
+                feedbackEl.innerHTML = `<div style="color:var(--error)">${randomMsg}</div>`;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questionQueue.length) {
+                displayQuestion();
+            } else {
+                showGroupSummary();
+            }
+        }
+
+        function showGroupSummary() {
+            showScreen('summary-screen');
+            const timeTotal = Math.floor((Date.now() - groupStartTime) / 1000);
+            document.getElementById('group-score-display').textContent = currentGroupScore;
+            document.getElementById('group-time').textContent = timeTotal;
+            document.getElementById('summary-message').textContent = summaryMessages[Math.floor(Math.random() * summaryMessages.length)];
+        }
+
+        function startNextGroup() {
+            showScreen('game-screen');
+            loadGroup(currentGroupIndex + 1);
+        }
+
+        function endGame() {
+            showScreen('end-screen');
+            document.getElementById('final-total-score').textContent = totalScore;
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- HELPERS ---
+
+        function generateDistractorsEnglishOnly(correctEnglishName, groupCharsAr) {
+            let pool = groupCharsAr.map(c => lettersDB[c].en);
+            pool = pool.filter(name => name !== correctEnglishName);
+            if(pool.length < 3) {
+                 const fillers = ["Sa", "Da", "Ka", "La", "Ma"];
+                 fillers.forEach(f => {
+                     if(f !== correctEnglishName && !pool.includes(f)) pool.push(f);
+                 });
+            }
+            pool = shuffleArray(pool).slice(0, 3);
+            pool.push(correctEnglishName);
+            return shuffleArray(pool);
+        }
+
+        function generateWordDistractors(correctWord) {
+            const commonDistractors = ["Bayt", "Bab", "Jamal", "Qalam", "Shams", "Nur", "Fil", "Kitab", "Bint", "Walad", "Samak", "Raml"];
+            let pool = commonDistractors.filter(w => w !== correctWord);
+            pool = shuffleArray(pool).slice(0, 3);
+            pool.push(correctWord);
+            return shuffleArray(pool);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
